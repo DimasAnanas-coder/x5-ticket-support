@@ -6,7 +6,7 @@ from ..schemas import Ticket, TicketCreate, TicketListParams, TicketPage, Ticket
 from ..service import TicketService
 from ..dependencies import get_service
 
-router = APIRouter(prefix="/tikets", tags=["Тикеты тех поддержки"])
+router = APIRouter(prefix="/tickets", tags=["Тикеты тех поддержки"])
 
 @router.post(
     path="/",

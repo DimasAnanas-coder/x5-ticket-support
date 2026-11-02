@@ -8,12 +8,12 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from .routes import tikets
+from .routes import tickets
 
 from app.exceptions import InvalidStatusTransitionError, TicketNotFoundError
 
 app = FastAPI(title="HelpDesk Lite")
-app.include_router(tikets.router)
+app.include_router(tickets.router)
 
 @app.exception_handler(TicketNotFoundError)
 def handle_not_found(request: Request, exc: TicketNotFoundError) -> JSONResponse:
