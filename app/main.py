@@ -34,7 +34,7 @@ def handle_invalid_transition(request: Request, exc: InvalidStatusTransitionErro
     summary="Создать тикет",
 )
 def create_ticket(payload: TicketCreate, service: TicketService = Depends(get_service)):
-    raise NotImplementedError
+    service.create_ticket(payload)
 
 
 @app.get(

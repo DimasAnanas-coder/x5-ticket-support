@@ -45,9 +45,9 @@ class Ticket(BaseModel):
     title: str
     description: str | None
     priority: Priority
-    status: TicketStatus
+    status: TicketStatus = TicketStatus.open
     assignee: str | None
-    created_at: datetime
+    created_at: datetime = Field(default_factory=datetime.now)
 
 
 class TicketPage(BaseModel):

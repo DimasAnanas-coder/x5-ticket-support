@@ -1,4 +1,4 @@
-from app.exceptions import InvalidStatusTransitionError
+from app.exceptions import InvalidStatusTransitionError, TicketNotFoundError
 from app.repository import TicketRepository
 from app.schemas import ALLOWED_TRANSITIONS, Ticket, TicketCreate, TicketPage, TicketUpdate
 from app.settings import Settings
@@ -10,10 +10,16 @@ class TicketService:
         self._settings = settings
 
     def create_ticket(self, payload: TicketCreate) -> Ticket:
-        raise NotImplementedError
+        new_id = self.repository.next_id()
+        new_ticket = Ticket(id=new_id, **payload.model_dump())
+        self._repository.add(new_ticket)
+        return new_ticket
 
     def get_ticket(self, ticket_id: int) -> Ticket:
-        return self._repository.get(ticket_id)
+        ticket = self._repository.get(ticket_id)
+        if not ticket:
+            raise TicketNotFoundError(ticket_id)
+        return ticket
 
     def list_tickets(
         self,
@@ -28,9 +34,16 @@ class TicketService:
         raise NotImplementedError
 
     def update_ticket(self, ticket_id: int, changes: TicketUpdate) -> Ticket:
-        # TODO: применить изменения, при смене статуса проверить
-        # ALLOWED_TRANSITIONS и поднять InvalidStatusTransitionError
-        raise NotImplementedError
+        ticket = self._repository.get(ticket_id)
+        if not ticket:
+            raise TicketNotFoundError(ticket_id)
+        if ALLOWED_TRANSITIONS[ticket.status] != changes.status:
+            raise InvalidStatusTransitionError(ticket.status, changes.status)
+        updated_ticket = ticket.model_copy(update=changes.model_dump())
+        self._repository.update(updated_ticket)
+        return updated_ticket
 
     def delete_ticket(self, ticket_id: int) -> None:
-        self._repository.delete(ticket_id)
+        if not self._repository.delete(ticket_id):
+            raise TicketNotFoundError(ticket_id)
+        

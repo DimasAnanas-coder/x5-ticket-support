@@ -1,4 +1,3 @@
-from app.exceptions import TicketNotFoundError
 from app.schemas import Ticket
 
 
@@ -10,23 +9,21 @@ class TicketRepository:
         self._next_id = 1
 
     def add(self, ticket: Ticket) -> Ticket:
-        raise NotImplementedError
+        self._tickets[ticket.id] = ticket
+        return self._tickets[ticket.id]
 
     def get(self, ticket_id: int) -> Ticket:
-        ticket = self._tickets.get(ticket_id)
-        if not ticket:
-            raise TicketNotFoundError(ticket_id)
-        return ticket
+        return self._tickets.get(ticket_id)
 
     def list_all(self) -> list[Ticket]:
-        raise NotImplementedError
+        return list(self._tickets.values())
 
     def update(self, ticket: Ticket) -> Ticket:
-        raise NotImplementedError
+        self._tickets[ticket.id] = ticket
+        return ticket
 
     def delete(self, ticket_id: int) -> None:
-        # TODO: удалить тикет или поднять TicketNotFoundError
-        raise NotImplementedError
+        return self._tickets.pop(ticket_id, None)
 
     def next_id(self) -> int:
         ticket_id = self._next_id
