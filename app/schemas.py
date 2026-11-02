@@ -18,6 +18,16 @@ class TicketStatus(str, Enum):
     closed = "closed"
 
 
+class TicketSortBy(str, Enum):
+    created_at = "created_at"
+    priority = "priority"
+
+
+class SortOrder(str, Enum):
+    asc = "asc"
+    desc = "desc"
+
+
 ALLOWED_TRANSITIONS: dict[TicketStatus, set[TicketStatus]] = {
     TicketStatus.open: {TicketStatus.in_progress},
     TicketStatus.in_progress: {TicketStatus.resolved, TicketStatus.open},
@@ -55,3 +65,10 @@ class TicketPage(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class TicketListParams(BaseModel):
+    sort_by: TicketSortBy = TicketSortBy.created_at
+    order: SortOrder = SortOrder.desc
+    page: int = Field(default=1, ge=1)
+    page_size: int | None = Field(default=None, ge=1)

@@ -1,6 +1,16 @@
 from app.exceptions import InvalidStatusTransitionError, TicketNotFoundError
 from app.repository import TicketRepository
-from app.schemas import ALLOWED_TRANSITIONS, Ticket, TicketCreate, TicketPage, TicketUpdate
+from app.schemas import (
+    ALLOWED_TRANSITIONS,
+    Priority,
+    SortOrder,
+    Ticket,
+    TicketCreate,
+    TicketListParams,
+    TicketPage,
+    TicketSortBy,
+    TicketUpdate,
+)
 from app.settings import Settings
 
 
@@ -21,17 +31,35 @@ class TicketService:
             raise TicketNotFoundError(ticket_id)
         return ticket
 
-    def list_tickets(
-        self,
-        sort_by: str,
-        order: str,
-        page: int,
-        page_size: int | None,
-    ) -> TicketPage:
-        # TODO: применить page_size из settings, если не передан,
-        #  ограничить его settings.max_page_size, отсортировать список
-        #  и вернуть нужную страницу
-        raise NotImplementedError
+    def list_tickets(self, params: TicketListParams) -> TicketPage:
+        page_size = (
+            params.page_size
+            if params.page_size is not None
+            else self._settings.default_page_size
+        )
+        page_size = min(page_size, self._settings.max_page_size)
+
+        tickets = self._repository.list_all()
+        total = len(tickets)
+
+        priority_order = {priority: rank for rank, priority in enumerate(Priority)}
+
+        if params.sort_by is TicketSortBy.created_at:
+            sort_key = lambda ticket: ticket.created_at
+        else:
+            sort_key = lambda ticket: priority_order[ticket.priority]
+
+        tickets.sort(key=sort_key, reverse=params.order is SortOrder.desc)
+
+        start = (params.page - 1) * page_size
+        items = tickets[start : start + page_size]
+
+        return TicketPage(
+            items=items,
+            total=total,
+            page=params.page,
+            page_size=page_size,
+        )
 
     def update_ticket(self, ticket_id: int, changes: TicketUpdate) -> Ticket:
         ticket = self._repository.get(ticket_id)
