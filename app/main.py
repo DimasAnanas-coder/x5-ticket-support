@@ -22,6 +22,6 @@ def handle_not_found(request: Request, exc: TicketNotFoundError) -> JSONResponse
 
 @app.exception_handler(InvalidStatusTransitionError)
 def handle_invalid_transition(request: Request, exc: InvalidStatusTransitionError) -> JSONResponse:
-    return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"detail": str(exc)})
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(exc)})
 
 
