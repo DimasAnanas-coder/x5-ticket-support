@@ -1,6 +1,8 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query, status
 
-from ..schemas import Ticket, TicketCreate, TicketPage, TicketUpdate
+from ..schemas import Ticket, TicketCreate, TicketListParams, TicketPage, TicketUpdate
 from ..service import TicketService
 from ..dependencies import get_service
 
@@ -22,13 +24,10 @@ def create_ticket(payload: TicketCreate, service: TicketService = Depends(get_se
     summary="Получить список тикетов",
 )
 def list_tickets(
-    sort_by: str = Query("created_at", pattern="^(created_at|priority)$"),
-    order: str = Query("desc", pattern="^(asc|desc)$"),
-    page: int = Query(1, ge=1),
-    page_size: int | None = Query(None, ge=1),
+    params: Annotated[TicketListParams, Query()],
     service: TicketService = Depends(get_service),
 ):
-    raise NotImplementedError
+    return service.list_tickets(params)
 
 
 @router.get(
