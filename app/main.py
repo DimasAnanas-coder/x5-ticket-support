@@ -10,10 +10,7 @@ from fastapi.responses import JSONResponse
 
 from .routes import tikets
 
-from app.dependencies import get_service
 from app.exceptions import InvalidStatusTransitionError, TicketNotFoundError
-from app.schemas import Ticket, TicketCreate, TicketPage, TicketUpdate
-from app.service import TicketService
 
 app = FastAPI(title="HelpDesk Lite")
 app.include_router(tikets.router)
