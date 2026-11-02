@@ -13,7 +13,7 @@ router = APIRouter(prefix="/tikets", tags=["Тикеты тех поддержк
     summary="Создать тикет",
 )
 def create_ticket(payload: TicketCreate, service: TicketService = Depends(get_service)):
-    service.create_ticket(payload)
+    return service.create_ticket(payload)
 
 
 @router.get(
@@ -43,7 +43,6 @@ def get_ticket(ticket_id: int, service: TicketService = Depends(get_service)):
 @router.patch(
     "/{ticket_id}",
     response_model=Ticket,
-    tags=["tickets"],
     summary="Изменить часть данных тикета",
 )
 def update_ticket(
