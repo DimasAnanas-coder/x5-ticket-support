@@ -20,7 +20,7 @@ class TicketService:
         self._settings = settings
 
     def create_ticket(self, payload: TicketCreate) -> Ticket:
-        new_id = self.repository.next_id()
+        new_id = self._repository.next_id()
         new_ticket = Ticket(id=new_id, **payload.model_dump())
         self._repository.add(new_ticket)
         return new_ticket
@@ -65,9 +65,9 @@ class TicketService:
         ticket = self._repository.get(ticket_id)
         if not ticket:
             raise TicketNotFoundError(ticket_id)
-        if ALLOWED_TRANSITIONS[ticket.status] != changes.status:
+        if changes.status and changes.status not in ALLOWED_TRANSITIONS.get(ticket.status, set()):
             raise InvalidStatusTransitionError(ticket.status, changes.status)
-        updated_ticket = ticket.model_copy(update=changes.model_dump())
+        updated_ticket = ticket.model_copy(update=changes.model_dump(exclude_none=True))
         self._repository.update(updated_ticket)
         return updated_ticket
 
