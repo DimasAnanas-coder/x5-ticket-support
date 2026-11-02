@@ -15,7 +15,7 @@ router = APIRouter(prefix="/tikets", tags=["Тикеты тех поддержк
     summary="Создать тикет",
 )
 def create_ticket(payload: TicketCreate, service: TicketService = Depends(get_service)):
-    service.create_ticket(payload)
+    return service.create_ticket(payload)
 
 
 @router.get(
