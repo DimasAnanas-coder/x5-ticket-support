@@ -42,7 +42,6 @@ def get_ticket(ticket_id: int, service: TicketService = Depends(get_service)):
 @router.patch(
     "/{ticket_id}",
     response_model=Ticket,
-    tags=["tickets"],
     summary="Изменить часть данных тикета",
 )
 def update_ticket(
